@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Encryption Algorithms</string>
+    <string name="message">Message</string>
+    <string name="key">Key</string>
+    <string name="send">Send</string>
+    <string name="error_empty_message">Пустое поле. Введите текст.</string>
+    <string name="error_negative_key">Вы ввели ключ: %s. Ключ не может быть меньше 0.</string>
+    <string name="error_unknown_sign">Неизвестный символ \"%s\". Используйте строчные русские буквы.</string>
 </resources>
