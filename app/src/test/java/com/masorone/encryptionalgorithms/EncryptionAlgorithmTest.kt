@@ -26,6 +26,15 @@ class EncryptionAlgorithmCaesarRuLowerCaseTest {
     }
 
     @Test
+    fun `encrypt empty message and key`() {
+        val expected = EncryptionAlgorithm.Result.EmptyMessage(
+            message = "Пустое поле. Введите текст."
+        )
+        val actual = encryptionAlgorithm.encrypt("", "")
+        assertEquals(expected, actual)
+    }
+
+    @Test
     fun `encrypt empty key or zero`() {
         val expected = EncryptionAlgorithm.Result.Success("абв")
         var actual = encryptionAlgorithm.encrypt("абв", "")
@@ -121,6 +130,15 @@ class EncryptionAlgorithmCaesarRuLowerCaseTest {
             message = "Пустое поле. Введите текст."
         )
         val actual = encryptionAlgorithm.decrypt("", "1")
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `decrypt empty message and key`() {
+        val expected = EncryptionAlgorithm.Result.EmptyMessage(
+            message = "Пустое поле. Введите текст."
+        )
+        val actual = encryptionAlgorithm.decrypt("", "")
         assertEquals(expected, actual)
     }
 

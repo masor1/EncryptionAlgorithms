@@ -1,7 +1,5 @@
 package com.masorone.encryptionalgorithms
 
-import android.content.Context
-
 interface EncryptionAlgorithm<I, O, K> {
 
     fun encrypt(data: I, key: K): Result<O>
@@ -47,7 +45,7 @@ interface EncryptionAlgorithm<I, O, K> {
         ) : Caesar {
 
             override fun encrypt(data: String, key: String): Result<String> {
-                if (key.isEmpty() || key == "0")
+                if ((key.isEmpty() || key == "0") && data.isNotEmpty())
                     return Result.Success(data)
                 if (data.isEmpty())
                     return Result.EmptyMessage(provideResources.string(R.string.error_empty_message))
@@ -85,7 +83,7 @@ interface EncryptionAlgorithm<I, O, K> {
             }
 
             override fun decrypt(data: String, key: String): Result<String> {
-                if (key.isEmpty() || key == "0")
+                if ((key.isEmpty() || key == "0") && data.isNotEmpty())
                     return Result.Success(data)
                 if (data.isEmpty())
                     return Result.EmptyMessage(provideResources.string(R.string.error_empty_message))
@@ -119,36 +117,6 @@ interface EncryptionAlgorithm<I, O, K> {
                     }
                 }
                 return Result.Success(result)
-            }
-        }
-    }
-}
-
-interface ProvideResources {
-
-    fun string(idRes: Int, formatArgs: String = ""): String
-
-    class Base(private val context: Context) : ProvideResources {
-
-        override fun string(idRes: Int, formatArgs: String) = with(context.resources) {
-            if (formatArgs.isEmpty())
-                getString(idRes)
-            else
-                getString(idRes, formatArgs)
-        }
-    }
-
-    class Test : ProvideResources {
-
-        override fun string(idRes: Int, formatArgs: String): String {
-            return when (idRes) {
-                R.string.error_empty_message -> "Пустое поле. " + "Введите текст."
-                R.string.error_negative_key -> "Вы ввели ключ: $formatArgs. " +
-                        "Ключ не может быть меньше 0."
-                R.string.error_unknown_sign -> "Неизвестный символ " +
-                        "\"${if (" " == formatArgs) "Пробел" else formatArgs}\"." +
-                        "Используйте строчные русские буквы."
-                else -> ""
             }
         }
     }
