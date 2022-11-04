@@ -21,15 +21,20 @@ interface EncryptionAlgorithm<I, O, K> {
         data class Success(private val message: String) : Result<String>(message)
     }
 
+    enum class Action {
+        ENCRYPT,
+        DECRYPT
+    }
+
     interface Caesar : EncryptionAlgorithm<String, String, String> {
 
-        class RuLowerCase(
+        abstract class Abstract(
             private val verifiedData: VerifiedData.StringMessageAndKey,
-            private val alphabet: String = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
+            private val alphabet: String
         ) : Caesar {
 
-            override fun encrypt(data: String, key: String): Result<String> {
-                return when (val verify = verifiedData.verify(data, key, alphabet)) {
+            fun `do`(data: String, key: String, action: Action) =
+                when (val verify = verifiedData.verify(data, key, alphabet)) {
                     is Result.Verified -> {
                         var intKey = key.toInt()
                         if (intKey > alphabet.length - 1)
@@ -38,10 +43,16 @@ interface EncryptionAlgorithm<I, O, K> {
                         data.forEach { chD ->
                             alphabet.forEachIndexed { index, chA ->
                                 if (chA == chD) {
-                                    result += if (index + intKey > alphabet.length - 1)
-                                        alphabet[intKey + index - alphabet.length]
-                                    else
-                                        alphabet[index + intKey]
+                                    result += when (action) {
+                                        Action.ENCRYPT -> if (index + intKey > alphabet.length - 1)
+                                            alphabet[intKey + index - alphabet.length]
+                                        else
+                                            alphabet[index + intKey]
+                                        Action.DECRYPT -> if (index - intKey < 0)
+                                            alphabet[alphabet.length - intKey + index]
+                                        else
+                                            alphabet[index - intKey]
+                                    }
                                 }
                             }
                         }
@@ -49,30 +60,16 @@ interface EncryptionAlgorithm<I, O, K> {
                     }
                     else -> verify
                 }
-            }
+        }
 
+        class RuLowerCase(
+            verifiedData: VerifiedData.StringMessageAndKey,
+            alphabet: String = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
+        ) : Abstract(verifiedData, alphabet) {
 
-            override fun decrypt(data: String, key: String): Result<String> {
-                return when (val verify = verifiedData.verify(data, key, alphabet)) {
-                    is Result.Verified -> {
-                        var intKey = key.toInt()
-                        if (intKey > alphabet.length - 1)
-                            intKey %= alphabet.length
-                        var result = ""
-                        data.forEach { chD ->
-                            alphabet.forEachIndexed { index, chA ->
-                                if (chA == chD)
-                                    result += if (index - intKey < 0)
-                                        alphabet[alphabet.length - intKey + index]
-                                    else
-                                        alphabet[index - intKey]
-                            }
-                        }
-                        Result.Success(result)
-                    }
-                    else -> verify
-                }
-            }
+            override fun encrypt(data: String, key: String) = `do`(data, key, Action.ENCRYPT)
+
+            override fun decrypt(data: String, key: String) = `do`(data, key, Action.DECRYPT)
         }
     }
 }
