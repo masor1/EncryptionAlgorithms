@@ -11,7 +11,9 @@ class EncryptionAlgorithmCaesarRuLowerCaseTest {
     @Before
     fun setUp() {
         encryptionAlgorithm = EncryptionAlgorithm.Caesar.RuLowerCase(
-            provideResources = ProvideResources.Test()
+            VerifiedData.StringMessageAndKey(
+                resources = ProvideResources.Test()
+            )
         )
     }
 
@@ -116,7 +118,7 @@ class EncryptionAlgorithmCaesarRuLowerCaseTest {
             "бва", "вяа", "лмн", "аыэ"
         )
         listOfMessages.forEachIndexed { index, message ->
-            val expected = EncryptionAlgorithm.Result.Success(data = listOfExpected[index])
+            val expected = EncryptionAlgorithm.Result.Success(message = listOfExpected[index])
             val actual = encryptionAlgorithm.encrypt(message, "1")
             assertEquals(expected, actual)
         }
@@ -224,7 +226,7 @@ class EncryptionAlgorithmCaesarRuLowerCaseTest {
             "абя", "бюя", "клм", "яъь"
         )
         listOfMessages.forEachIndexed { index, message ->
-            val expected = EncryptionAlgorithm.Result.Success(data = listOfExpected[index])
+            val expected = EncryptionAlgorithm.Result.Success(message = listOfExpected[index])
             val actual = encryptionAlgorithm.decrypt(message, "1")
             assertEquals(expected, actual)
         }
